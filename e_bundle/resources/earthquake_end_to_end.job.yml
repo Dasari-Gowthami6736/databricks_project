@@ -1,0 +1,29 @@
+resources:
+  jobs:
+    e_job_end_to_end:
+      name: e_job_end_to_end
+      tasks:
+        - task_key: e_ingestion_bronze
+          notebook_task:
+            notebook_path: /Workspace/databricks_project/databricks_project/e_bundle/src/notebooks/e_ingestion_bronze
+            base_parameters:
+              catalog_name: my_first_project
+            source: WORKSPACE
+        - task_key: e_bronze_to_silver_task
+          depends_on:
+            - task_key: e_ingestion_bronze
+          pipeline_task:
+            pipeline_id: 4786bbb8-21ac-4986-9d1a-35184bf3a45a
+        - task_key: e_dashboard
+          depends_on:
+            - task_key: e_bronze_to_silver_task
+          dashboard_task:
+            subscription: {}
+            warehouse_id: 6323cee9636d5737
+            dashboard_id: 01f16d3fddf31b17a490e23c67faa078
+      queue:
+        enabled: true
+      parameters:
+        - name: catalog_name
+          default: e_ingestion_bronze
+      performance_target: PERFORMANCE_OPTIMIZED
